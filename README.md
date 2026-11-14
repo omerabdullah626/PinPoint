@@ -1,6 +1,6 @@
 # Pinpoint: In-Reply Bookmarks for AI Chats
 
-> A Chrome Extension (Manifest V3) that lets you bookmark specific spots inside long AI chat replies across ChatGPT, Claude, and Gemini, and instantly jump back to them via a floating, draggable panel.
+> A Chrome Extension (Manifest V3) that lets you bookmark specific spots inside long AI chat replies across ChatGPT, Claude, Gemini, DeepSeek, Perplexity, Copilot, Mistral, Poe, and Grok, and instantly jump back to them via a floating, draggable panel.
 
 ---
 
@@ -8,12 +8,18 @@
 
 - **In-Reply Precision**: Bookmarks point to exact scroll locations and elements inside long responses, not just the whole chat or reply.
 - **Floating Draggable Panel**: Renders in an isolated **Shadow DOM** so it never clashes with host page CSS or theme styles.
-- **Draggable & Collapsible**: Drag anywhere on screen by the header. Minimize into a compact badge (`📌 N`) when reading.
+- **Draggable & Collapsible**: Drag anywhere on screen by the header. Minimize into a compact badge (`📌 N`) when reading. Edge-anchored expansion ensures it expands inward smoothly and returns exactly where placed.
 - **Cross-Platform Adapters**: Dedicated DOM adapters for:
-  - **ChatGPT** (`chatgpt.com`)
+  - **ChatGPT** (`chatgpt.com`, `chat.openai.com`)
   - **Claude** (`claude.ai`)
   - **Gemini** (`gemini.google.com`)
-  - Universal fallback for dynamic updates
+  - **DeepSeek** (`chat.deepseek.com`) — Supports both final markdown answers and reasoning/thinking blocks
+  - **Perplexity AI** (`perplexity.ai`)
+  - **Microsoft Copilot** (`copilot.microsoft.com`)
+  - **Mistral / Le Chat** (`chat.mistral.ai`)
+  - **Poe** (`poe.com`)
+  - **Grok** (`grok.com`)
+  - Universal smart fallback for other chat interfaces
 - **Smart Scroll Restoration**:
   - Restores to exact element + vertical offset.
   - Smoothly scrolls the correct scrollable container (handles inner scroll containers).

@@ -12,7 +12,19 @@ const SUPPORTED_PATTERNS = [
   "https://*.openai.com/*",
   "https://claude.ai/*",
   "https://*.claude.ai/*",
-  "https://gemini.google.com/*"
+  "https://gemini.google.com/*",
+  "https://chat.deepseek.com/*",
+  "https://*.deepseek.com/*",
+  "https://www.perplexity.ai/*",
+  "https://*.perplexity.ai/*",
+  "https://copilot.microsoft.com/*",
+  "https://*.copilot.microsoft.com/*",
+  "https://chat.mistral.ai/*",
+  "https://*.mistral.ai/*",
+  "https://poe.com/*",
+  "https://*.poe.com/*",
+  "https://grok.com/*",
+  "https://*.grok.com/*"
 ];
 
 function registerContextMenu() {

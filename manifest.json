@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Pinpoint - In-Reply Bookmarks for AI Chats",
   "version": "0.1.0",
-  "description": "Bookmark specific spots inside long AI chat replies on ChatGPT, Claude, and Gemini.",
+  "description": "Bookmark specific spots inside long AI chat replies across ChatGPT, Claude, Gemini, DeepSeek, Perplexity, Copilot, Mistral, Poe, and Grok.",
   "permissions": [
     "contextMenus"
   ],
@@ -13,7 +13,19 @@
     "https://*.openai.com/*",
     "https://claude.ai/*",
     "https://*.claude.ai/*",
-    "https://gemini.google.com/*"
+    "https://gemini.google.com/*",
+    "https://chat.deepseek.com/*",
+    "https://*.deepseek.com/*",
+    "https://www.perplexity.ai/*",
+    "https://*.perplexity.ai/*",
+    "https://copilot.microsoft.com/*",
+    "https://*.copilot.microsoft.com/*",
+    "https://chat.mistral.ai/*",
+    "https://*.mistral.ai/*",
+    "https://poe.com/*",
+    "https://*.poe.com/*",
+    "https://grok.com/*",
+    "https://*.grok.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -27,7 +39,19 @@
         "https://*.openai.com/*",
         "https://claude.ai/*",
         "https://*.claude.ai/*",
-        "https://gemini.google.com/*"
+        "https://gemini.google.com/*",
+        "https://chat.deepseek.com/*",
+        "https://*.deepseek.com/*",
+        "https://www.perplexity.ai/*",
+        "https://*.perplexity.ai/*",
+        "https://copilot.microsoft.com/*",
+        "https://*.copilot.microsoft.com/*",
+        "https://chat.mistral.ai/*",
+        "https://*.mistral.ai/*",
+        "https://poe.com/*",
+        "https://*.poe.com/*",
+        "https://grok.com/*",
+        "https://*.grok.com/*"
       ],
       "js": [
         "content.js"

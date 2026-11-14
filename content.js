@@ -182,6 +182,180 @@
       }
     },
 
+    deepseek: {
+      findReply(el) {
+        if (!el || typeof el.closest !== 'function') return null;
+
+        if (el.closest('textarea, #chat-input, form, nav, header, aside, [role="navigation"], button')) {
+          return null;
+        }
+
+        if (el.closest('[data-role="user"]') || el.closest('[data-testid*="user"]')) {
+          return null;
+        }
+
+        const dsMarkdown = el.closest('.ds-markdown, [class*="ds-markdown"]');
+        if (dsMarkdown) return dsMarkdown;
+
+        const dsThink = el.closest('.ds-think-content, [class*="think-content"], [class*="ds-think"]');
+        if (dsThink) return dsThink;
+
+        const roleAssistant = el.closest('[data-role="assistant"]');
+        if (roleAssistant) return roleAssistant;
+
+        const inFeed = el.closest('[data-conversation-scroll], main, [role="main"]');
+        if (inFeed) {
+          return el.closest('div > div') || el.parentElement;
+        }
+
+        return null;
+      },
+      getScrollContainer() {
+        return document.querySelector('[data-conversation-scroll]');
+      }
+    },
+
+    perplexity: {
+      findReply(el) {
+        if (!el || typeof el.closest !== 'function') return null;
+
+        if (el.closest('textarea, [contenteditable="true"], form, nav, aside, header, [role="navigation"], button')) {
+          return null;
+        }
+
+        if (el.closest('[data-is-user="true"]') || el.closest('[class*="user-query"]')) {
+          return null;
+        }
+
+        const prose = el.closest('.markdown, [class*="prose"], div[dir="auto"]');
+        if (prose) return prose;
+
+        const answer = el.closest('[class*="answer"], [class*="response"], [class*="message"]');
+        if (answer) return answer;
+
+        const inMain = el.closest('main, [role="main"]');
+        if (inMain) {
+          return el.closest('div > div') || el.parentElement;
+        }
+
+        return null;
+      },
+      getScrollContainer() {
+        return null;
+      }
+    },
+
+    copilot: {
+      findReply(el) {
+        if (!el || typeof el.closest !== 'function') return null;
+
+        if (el.closest('textarea, cib-text-input, form, nav, aside, header, [role="navigation"], button')) {
+          return null;
+        }
+
+        if (el.closest('[data-is-user="true"]') || el.closest('[data-author="user"]')) {
+          return null;
+        }
+
+        const aiContent = el.closest('[data-content="ai"]') ||
+                          el.closest('cib-message[type="text"]') ||
+                          el.closest('[class*="assistant-message"]') ||
+                          el.closest('[class*="message-content"]');
+        if (aiContent) return aiContent;
+
+        const inMain = el.closest('main, [role="region"], cib-serp');
+        if (inMain) {
+          return el.closest('div > div') || el.parentElement;
+        }
+
+        return null;
+      },
+      getScrollContainer() {
+        return null;
+      }
+    },
+
+    mistral: {
+      findReply(el) {
+        if (!el || typeof el.closest !== 'function') return null;
+
+        if (el.closest('textarea, [contenteditable="true"], form, nav, aside, header, [role="navigation"], button')) {
+          return null;
+        }
+
+        if (el.closest('[data-is-user="true"]') || el.closest('[data-role="user"]')) {
+          return null;
+        }
+
+        const prose = el.closest('.markdown, [class*="prose"], [class*="markdown"]');
+        if (prose) return prose;
+
+        const turn = el.closest('[data-role="assistant"], div.group\\/conversation-turn, [class*="conversation-turn"]');
+        if (turn) return turn;
+
+        const inMain = el.closest('main, [role="main"]');
+        if (inMain) {
+          return el.closest('div > div') || el.parentElement;
+        }
+
+        return null;
+      },
+      getScrollContainer() {
+        return null;
+      }
+    },
+
+    poe: {
+      findReply(el) {
+        if (!el || typeof el.closest !== 'function') return null;
+
+        if (el.closest('textarea, [class*="ChatMessageInput"], form, nav, aside, header, button')) {
+          return null;
+        }
+
+        if (el.closest('[class*="ChatMessage_userMessage"], [data-is-user="true"]')) {
+          return null;
+        }
+
+        const poeMsg = el.closest('[class*="ChatMessage_chatMessage"]') ||
+                       el.closest('[class*="Message_messageText"]') ||
+                       el.closest('.markdown, [class*="markdown"]');
+        if (poeMsg) return poeMsg;
+
+        return null;
+      },
+      getScrollContainer() {
+        return null;
+      }
+    },
+
+    grok: {
+      findReply(el) {
+        if (!el || typeof el.closest !== 'function') return null;
+
+        if (el.closest('textarea, form, nav, aside, header, [role="navigation"], button')) {
+          return null;
+        }
+
+        if (el.closest('[data-testid*="user"], [class*="user-message"]')) {
+          return null;
+        }
+
+        const grokMsg = el.closest('[class*="response"], [class*="markdown"], [class*="prose"]');
+        if (grokMsg) return grokMsg;
+
+        const inMain = el.closest('main, [role="main"]');
+        if (inMain) {
+          return el.closest('div > div') || el.parentElement;
+        }
+
+        return null;
+      },
+      getScrollContainer() {
+        return null;
+      }
+    },
+
     generic: {
       findReply(el) {
         if (!el || typeof el.closest !== 'function') return null;
@@ -209,6 +383,24 @@
     }
     if (host.includes('gemini.google.com')) {
       return adapters.gemini;
+    }
+    if (host.includes('deepseek.com')) {
+      return adapters.deepseek;
+    }
+    if (host.includes('perplexity.ai')) {
+      return adapters.perplexity;
+    }
+    if (host.includes('copilot.microsoft.com')) {
+      return adapters.copilot;
+    }
+    if (host.includes('mistral.ai')) {
+      return adapters.mistral;
+    }
+    if (host.includes('poe.com')) {
+      return adapters.poe;
+    }
+    if (host.includes('grok.com')) {
+      return adapters.grok;
     }
     return adapters.generic;
   }

@@ -296,7 +296,95 @@ fireContextMenu(geminiUserP, 300, 200);
 sendCreateBookmark();
 console.log('✓ Gemini user query excluded');
 
-// 6. Test Input Box / Form Exclusions
+// 6. Test DeepSeek Adapter
+console.log('\n--- Testing DeepSeek Adapter ---');
+global.window.location.hostname = 'chat.deepseek.com';
+
+const dsScrollContainer = new MockElement('div', { 'data-conversation-scroll': 'true' });
+const dsMarkdown = new MockElement('div', { class: 'ds-markdown ds-markdown--block' });
+const dsParagraph = new MockElement('p', { class: 'ds-markdown-paragraph' }, 'DeepSeek V3 architectural innovations and multi-head latent attention.');
+dsScrollContainer.appendChild(dsMarkdown);
+dsMarkdown.appendChild(dsParagraph);
+
+fireContextMenu(dsParagraph, 280, 350);
+sendCreateBookmark();
+console.log('✓ Bookmark created on DeepSeek (.ds-markdown)');
+
+// DeepSeek thinking / reasoning content
+const dsThink = new MockElement('div', { class: 'ds-think-content' });
+const dsThinkP = new MockElement('p', {}, 'Let me think through the latency requirements...');
+dsScrollContainer.appendChild(dsThink);
+dsThink.appendChild(dsThinkP);
+
+fireContextMenu(dsThinkP, 280, 200);
+sendCreateBookmark();
+console.log('✓ Bookmark created on DeepSeek thinking block (.ds-think-content)');
+
+// 7. Test Perplexity AI Adapter
+console.log('\n--- Testing Perplexity AI Adapter ---');
+global.window.location.hostname = 'www.perplexity.ai';
+
+const pxContainer = new MockElement('div', { class: 'prose dark:prose-invert' });
+const pxParagraph = new MockElement('div', { dir: 'auto' }, 'Perplexity search synthesis and citations overview.');
+pxContainer.appendChild(pxParagraph);
+
+fireContextMenu(pxParagraph, 300, 400);
+sendCreateBookmark();
+console.log('✓ Bookmark created on Perplexity AI');
+
+// 8. Test Microsoft Copilot Adapter
+console.log('\n--- Testing Microsoft Copilot Adapter ---');
+global.window.location.hostname = 'copilot.microsoft.com';
+
+const copilotTurn = new MockElement('div', { 'data-content': 'ai' });
+const copilotP = new MockElement('p', {}, 'Microsoft Copilot answer summary with grounded web indices.');
+copilotTurn.appendChild(copilotP);
+
+fireContextMenu(copilotP, 320, 420);
+sendCreateBookmark();
+console.log('✓ Bookmark created on Microsoft Copilot ([data-content="ai"])');
+
+// 9. Test Mistral Le Chat Adapter
+console.log('\n--- Testing Mistral Le Chat Adapter ---');
+global.window.location.hostname = 'chat.mistral.ai';
+
+const mistralTurn = new MockElement('div', { 'data-role': 'assistant', class: 'group/conversation-turn' });
+const mistralProse = new MockElement('div', { class: 'prose' });
+const mistralP = new MockElement('p', {}, 'Mistral Large 2 performance characteristics and benchmark comparison.');
+mistralTurn.appendChild(mistralProse);
+mistralProse.appendChild(mistralP);
+
+fireContextMenu(mistralP, 300, 380);
+sendCreateBookmark();
+console.log('✓ Bookmark created on Mistral Le Chat');
+
+// 10. Test Poe Adapter
+console.log('\n--- Testing Poe Adapter ---');
+global.window.location.hostname = 'poe.com';
+
+const poeMsg = new MockElement('div', { class: 'ChatMessage_chatMessage__x7a' });
+const poeText = new MockElement('div', { class: 'Message_messageText__abc' });
+const poeP = new MockElement('p', {}, 'Poe assistant multi-bot aggregation output.');
+poeMsg.appendChild(poeText);
+poeText.appendChild(poeP);
+
+fireContextMenu(poeP, 290, 450);
+sendCreateBookmark();
+console.log('✓ Bookmark created on Poe (ChatMessage_chatMessage)');
+
+// 11. Test Grok Adapter
+console.log('\n--- Testing Grok Adapter ---');
+global.window.location.hostname = 'grok.com';
+
+const grokMsg = new MockElement('div', { class: 'response-content prose' });
+const grokP = new MockElement('p', {}, 'Grok real-time knowledge synthesis and playful tone.');
+grokMsg.appendChild(grokP);
+
+fireContextMenu(grokP, 310, 400);
+sendCreateBookmark();
+console.log('✓ Bookmark created on Grok');
+
+// 12. Test Input Box / Form Exclusions
 console.log('\n--- Testing Input / Form Exclusions ---');
 const formEl = new MockElement('form');
 const textareaEl = new MockElement('textarea', {}, 'Drafting a new prompt...');
@@ -305,7 +393,7 @@ fireContextMenu(textareaEl, 300, 700);
 sendCreateBookmark();
 console.log('✓ Input / textarea properly excluded');
 
-// 7. Test URL Change / SPA Chat Switch
+// 13. Test URL Change / SPA Chat Switch
 console.log('\n--- Testing SPA URL Change / Reset ---');
 global.window.location.href = 'https://chatgpt.com/c/different-chat-456';
 const popstateCbs = listeners['popstate'] || [];
