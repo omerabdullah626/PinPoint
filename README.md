@@ -1,97 +1,159 @@
 # Pinpoint: In-Reply Bookmarks for AI Chats
 
-> A Chrome Extension (Manifest V3) that lets you bookmark specific spots inside long AI chat replies across ChatGPT, Claude, Gemini, DeepSeek, Perplexity, Copilot, Mistral, Poe, and Grok, and instantly jump back to them via a floating, draggable panel.
+[![Manifest V3](https://img.shields.io/badge/Manifest-V3-blue.svg)](https://developer.chrome.com/docs/extensions/mv3/intro/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+> A lightweight, privacy-first Chrome extension that lets you bookmark **specific spots inside long AI chat replies** and jump back to them with a single click.
+
+Works seamlessly across **ChatGPT**, **Claude**, **Gemini**, **DeepSeek**, **Perplexity**, **Microsoft Copilot**, **Mistral**, **Poe**, and **Grok**.
 
 ---
 
-## Features
+## The Problem
 
-- **In-Reply Precision**: Bookmarks point to exact scroll locations and elements inside long responses, not just the whole chat or reply.
-- **Floating Draggable Panel**: Renders in an isolated **Shadow DOM** so it never clashes with host page CSS or theme styles.
-- **Draggable & Collapsible**: Drag anywhere on screen by the header. Minimize into a compact badge (`📌 N`) when reading. Edge-anchored expansion ensures it expands inward smoothly and returns exactly where placed.
-- **Cross-Platform Adapters**: Dedicated DOM adapters for:
-  - **ChatGPT** (`chatgpt.com`, `chat.openai.com`)
-  - **Claude** (`claude.ai`)
-  - **Gemini** (`gemini.google.com`)
-  - **DeepSeek** (`chat.deepseek.com`) — Supports both final markdown answers and reasoning/thinking blocks
-  - **Perplexity AI** (`perplexity.ai`)
-  - **Microsoft Copilot** (`copilot.microsoft.com`)
-  - **Mistral / Le Chat** (`chat.mistral.ai`)
-  - **Poe** (`poe.com`)
-  - **Grok** (`grok.com`)
-  - Universal smart fallback for other chat interfaces
-- **Smart Scroll Restoration**:
-  - Restores to exact element + vertical offset.
-  - Smoothly scrolls the correct scrollable container (handles inner scroll containers).
-  - Highlights the bookmarked spot with a temporary pulse.
-  - Falls back to raw `scrollTop` if the DOM dynamically virtualized.
-- **Auto-Labels**: Extracts a clean ~40-character snippet from the nearest paragraph or heading plus an order number (`#1`, `#2`).
-- **SPA Chat Switch Detection**: Automatically clears in-memory bookmarks when navigating to another chat within the single-page application.
-- **Light & Dark Theme Support**: Automatically matches your system preference and the host site's active theme.
-- **Zero Host Permissions Bloat**: Requires only `contextMenus` and host permissions for the three supported AI chat domains.
+Modern AI models generate extensive, in-depth responses spanning multiple screens. Existing bookmark extensions either save the entire conversation or just the top of a message. When you want to return to a specific code block, mathematical formulation, or argument buried halfway down a 2,000-word response, you are forced to scroll and search manually.
+
+## The Solution
+
+**Pinpoint** lets you right-click on the exact line, code block, or paragraph you care about and choose **"Bookmark this spot"**. A minimalist, floating panel tracks your spots and smoothly scrolls you right back to them whenever clicked.
 
 ---
 
-## File Structure
+## Key Features
 
-```text
-pinpoint/
-├── manifest.json         # Manifest V3 extension configuration
-├── background.js         # Service worker registering the context menu
-├── content.js            # Content script with site adapters, store, & Shadow DOM UI
-├── icons/                # High-res extension icons (16px, 32px, 48px, 128px)
-│   ├── icon16.png
-│   ├── icon32.png
-│   ├── icon48.png
-│   └── icon128.png
-├── test/
-│   ├── test-logic.js     # Unit test suite covering adapters, exclusions & SPA navigation
-│   └── manual-test.html  # Interactive manual test harness
-├── chat-bookmarks-spec.md# Project specification
-└── README.md             # Documentation & installation instructions
-```
+- 🎯 **In-Reply Precision**: Bookmarks point to exact scroll locations and specific elements within long replies, not just the whole chat or top of a turn.
+- 📌 **Smart Floating Pill**:
+  - Drag anywhere on the screen.
+  - Collapse into a compact, unobtrusive badge (`📌 N`).
+  - **Edge-Anchored Expansion**: Expands inward smoothly from wherever you placed it and returns right back to that exact spot when closed—no wandering or jumping across the screen.
+- 🛡️ **Isolated Shadow DOM**: UI renders inside an isolated Shadow DOM container. Host website CSS cannot break Pinpoint, and Pinpoint's styling never leaks onto the page.
+- ⚡ **Native Smooth Scrolling & Pulse**: Uses native element traversal to bring your bookmarked line directly to the center of your screen, highlighted with a temporary visual pulse.
+- 🏷️ **Automatic Snippet Labels**: Automatically creates clean ~40-character preview labels from the text at your click point plus sequential order numbers (`#1`, `#2`, etc.).
+- 🌓 **Theme Synchronization**: Automatically detects and adapts to your OS preference and the host site's active light/dark mode.
+- 🔒 **100% Client-Side & Private**:
+  - Zero external network requests.
+  - Zero telemetry, tracking, or analytics.
+  - In-memory session storage (bookmarks naturally clear when navigating between chats or refreshing).
+  - Minimal permissions: only requests `contextMenus` and host permissions for supported AI domains.
 
 ---
 
-## How to Install and Load in Chrome
+## Supported Platforms
 
-1. Open **Google Chrome** (or any Chromium browser such as Brave, Edge, or Arc).
-2. Navigate to `chrome://extensions` in the address bar.
-3. Enable the **"Developer mode"** toggle located in the top-right corner.
+| Platform | Domain | Supported Content |
+| :--- | :--- | :--- |
+| **ChatGPT** | `chatgpt.com`, `chat.openai.com` | Responses, code blocks, tables, lists |
+| **Claude** | `claude.ai` | Assistant messages, artifacts, code |
+| **Gemini** | `gemini.google.com` | Model responses, markdown cards |
+| **DeepSeek** | `chat.deepseek.com` | Markdown output & Deep Thinking traces |
+| **Perplexity AI** | `perplexity.ai` | Search synthesis, answer sections, sources |
+| **Microsoft Copilot** | `copilot.microsoft.com` | Copilot AI answers & cards |
+| **Mistral / Le Chat** | `chat.mistral.ai` | Le Chat assistant conversation turns |
+| **Poe** | `poe.com` | Multi-bot replies & markdown blocks |
+| **Grok** | `grok.com` | Grok real-time responses & code |
+| *Universal Fallback* | Other AI interfaces | Automatic detection of reply containers |
+
+---
+
+## Installation
+
+### Load Unpacked in Chrome / Chromium
+
+Pinpoint runs on any Chromium-based browser (Google Chrome, Brave, Microsoft Edge, Arc, Opera, Vivaldi):
+
+1. **Clone or download** this repository:
+   ```bash
+   git clone https://github.com/your-username/pinpoint.git
+   ```
+2. Open your browser and navigate to the extensions page:
+   - Chrome: `chrome://extensions`
+   - Brave: `brave://extensions`
+   - Edge: `edge://extensions`
+3. Enable the **"Developer mode"** toggle in the top-right corner.
 4. Click the **"Load unpacked"** button in the top-left toolbar.
-5. In the file picker dialog, select this folder (`/home/omer-abdullah/Downloads/pinpoint`).
-6. The extension **"Pinpoint - In-Reply Bookmarks for AI Chats"** will appear in your installed extensions list.
+5. Select the `PinPoint` folder from the cloned repository.
+6. The extension is installed and ready to use!
 
 ---
 
 ## How to Use
 
-1. Navigate to any of the supported AI chat websites:
-   - [ChatGPT](https://chatgpt.com)
-   - [Claude](https://claude.ai)
-   - [Gemini](https://gemini.google.com)
-2. Open or start a chat with a long response.
-3. **Right-click** on any paragraph, code snippet, or heading inside an AI reply.
-4. Select **"Bookmark this spot"** from the context menu.
-5. The **Pinpoint** floating panel will appear on the right side with your new bookmark.
-6. Scroll anywhere else in the conversation, then **click the bookmark in the panel** to smoothly return to that spot.
-7. Click the small **`×`** button next to any bookmark to delete it, or click the **`−`** button in the header to collapse the panel into a compact badge.
+1. Navigate to any supported AI chat (e.g. [ChatGPT](https://chatgpt.com), [Claude](https://claude.ai), [Gemini](https://gemini.google.com), [DeepSeek](https://chat.deepseek.com), [Perplexity](https://www.perplexity.ai)).
+2. In any long response, **right-click** on the specific paragraph, code snippet, or heading you want to remember.
+3. Select **"Bookmark this spot"** from the context menu.
+4. The floating **Pinpoint** panel will appear on screen showing your new bookmark with an auto-generated label.
+5. Scroll anywhere else in the conversation.
+6. **Click the bookmark** in the panel to smoothly glide right back to that exact spot.
+7. Click **`−`** to collapse the panel into a draggable badge, or click **`×`** next to any bookmark to delete it.
 
 ---
 
-## Running Unit Tests
+## Project Structure
 
-Run the included unit test suite with Node.js:
+```text
+PinPoint/
+├── manifest.json         # Manifest V3 configuration & domain permissions
+├── background.js         # Service worker registering context menus
+├── content.js            # Content script: site adapters, store, Shadow DOM UI & scrolling
+├── icons/                # Extension icons (16px, 32px, 48px, 128px)
+│   ├── icon16.png
+│   ├── icon32.png
+│   ├── icon48.png
+│   └── icon128.png
+├── test/
+│   ├── test-logic.js     # Synchronous unit test suite (DOM adapters, exclusions, SPA switching)
+│   └── manual-test.html  # Interactive test harness simulating multi-platform chat turns
+├── .gitignore            # Git exclusion rules
+├── LICENSE               # MIT License
+└── README.md             # Documentation
+```
+
+---
+
+## Running Tests
+
+Pinpoint includes a comprehensive unit test suite covering DOM adapters, input exclusions, and single-page application (SPA) chat transitions:
 
 ```bash
+# Run unit test suite
 node test/test-logic.js
 ```
 
-All tests for ChatGPT, Claude, and Gemini reply detection, user message exclusions, label formatting, and SPA URL switching run synchronously and output verified status checks.
+You can also test the visual UI and scrolling interactions directly by opening `test/manual-test.html` in your browser.
 
 ---
 
-## Decisions & Chrome Web Store Readiness
+## Architecture & Technical Highlights
 
-- **Storage**: In-memory store per user session (bookmarks reset on manual reload or chat navigation). Interface is cleanly separated in `store` (`list()`, `add()`, `remove()`, `clear()`) to support `chrome.storage.local` if persistent bookmarks are desired in future versions.
-- **Security & Privacy**: No external network requests, zero telemetry, no content scripts on unrelated domains, and minimal manifest permissions for seamless Chrome Web Store approval.
+- **Manifest V3 Compliant**: Built strictly around MV3 specifications using background service workers and declarative context menus.
+- **Resilient Multi-Site Adapters**: Rather than relying on fragile hashed class names that change on every deploy, Pinpoint targets structural roles, semantic tags, and content containers.
+- **Target Tracking**: Captures the exact element and vertical offset during the right-click capture phase.
+- **Native Scrolling**: Delegates viewport calculation to browser-native `scrollIntoView({ behavior: 'smooth', block: 'center' })` on the live connected node, ensuring compatibility with nested scrollers and virtualized containers.
+
+---
+
+## Privacy Policy
+
+Pinpoint is strictly local and private:
+- No data is ever collected, transmitted, or stored on external servers.
+- No third-party scripts, trackers, or CDNs are loaded.
+- Bookmarks exist in memory for your current session and reset when a conversation is changed or reloaded.
+
+---
+
+## Contributing
+
+Contributions, feature requests, and bug reports are welcome! Feel free to check the [issues page](https://github.com/your-username/pinpoint/issues) or submit a pull request.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## License
+
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
