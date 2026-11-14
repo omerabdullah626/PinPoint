@@ -1,5 +1,8 @@
 # Pinpoint
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Manifest V3](https://img.shields.io/badge/Manifest-V3-blue.svg)
+
 Chrome extension (Manifest V3) that lets you bookmark specific spots inside long AI chat responses and scroll back to them.
 
 Supported sites:
