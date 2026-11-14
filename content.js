@@ -636,9 +636,53 @@
     `;
   }
 
-  // Position state (default top right)
-  let panelLeft = window.innerWidth - 315;
-  let panelTop = 75;
+  // UI Dimensions constants
+  const PILL_WIDTH = 135;
+  const PILL_HEIGHT = 36;
+  const WINDOW_WIDTH = 290;
+  const WINDOW_HEIGHT = 320;
+
+  // Track position of the collapsed pill (persists where the user puts it)
+  let pillPos = {
+    left: Math.max(8, window.innerWidth - PILL_WIDTH - 20),
+    top: 75
+  };
+
+  // Track position of the expanded panel window
+  let windowPos = {
+    left: Math.max(8, window.innerWidth - WINDOW_WIDTH - 20),
+    top: 75
+  };
+
+  function openPanel() {
+    isCollapsed = false;
+
+    // Anchor the expanded window relative to the pill's current position
+    const pillCenter = pillPos.left + (PILL_WIDTH / 2);
+    if (pillCenter > window.innerWidth / 2) {
+      // Pill is on right side: align window's right edge to pill's right edge
+      const pillRight = pillPos.left + PILL_WIDTH;
+      const desiredLeft = pillRight - WINDOW_WIDTH;
+      windowPos.left = Math.max(8, Math.min(window.innerWidth - WINDOW_WIDTH - 8, desiredLeft));
+    } else {
+      // Pill is on left side: align window's left edge to pill's left edge
+      windowPos.left = Math.max(8, Math.min(window.innerWidth - WINDOW_WIDTH - 8, pillPos.left));
+    }
+
+    // Vertically align with pill's top, ensuring window stays within screen bounds
+    windowPos.top = Math.max(8, Math.min(window.innerHeight - WINDOW_HEIGHT - 8, pillPos.top));
+
+    render();
+  }
+
+  function collapsePanel() {
+    isCollapsed = true;
+    // Pill position is preserved exactly where user placed it, clamped to viewport
+    pillPos.left = Math.max(8, Math.min(window.innerWidth - PILL_WIDTH - 8, pillPos.left));
+    pillPos.top = Math.max(8, Math.min(window.innerHeight - PILL_HEIGHT - 8, pillPos.top));
+
+    render();
+  }
 
   function initUI() {
     if (document.getElementById('pinpoint-bookmark-root')) return;
@@ -736,11 +780,11 @@
     const bookmarks = store.list();
     const count = bookmarks.length;
 
-    // Clamp coordinates within current viewport
-    const panelWidth = isCollapsed ? 140 : 290;
-    const panelHeight = isCollapsed ? 36 : 300;
-    panelLeft = Math.max(8, Math.min(window.innerWidth - panelWidth - 8, panelLeft));
-    panelTop = Math.max(8, Math.min(window.innerHeight - panelHeight - 8, panelTop));
+    // Ensure positions are clamped within current viewport
+    pillPos.left = Math.max(8, Math.min(window.innerWidth - PILL_WIDTH - 8, pillPos.left));
+    pillPos.top = Math.max(8, Math.min(window.innerHeight - PILL_HEIGHT - 8, pillPos.top));
+    windowPos.left = Math.max(8, Math.min(window.innerWidth - WINDOW_WIDTH - 8, windowPos.left));
+    windowPos.top = Math.max(8, Math.min(window.innerHeight - WINDOW_HEIGHT - 8, windowPos.top));
 
     let bodyContent = '';
     if (bookmarks.length === 0) {
@@ -774,7 +818,7 @@
       <style>${getPanelStyles()}</style>
       <div class="pinpoint-container ${darkClass}">
         ${isCollapsed ? `
-          <div class="collapsed-pill" style="left: ${panelLeft}px; top: ${panelTop}px;">
+          <div class="collapsed-pill" style="left: ${pillPos.left}px; top: ${pillPos.top}px;">
             <svg class="pill-icon" viewBox="0 0 24 24">
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
             </svg>
@@ -782,7 +826,7 @@
             ${count > 0 ? `<span class="pill-badge">${count}</span>` : ''}
           </div>
         ` : `
-          <div class="panel-window" style="left: ${panelLeft}px; top: ${panelTop}px;">
+          <div class="panel-window" style="left: ${windowPos.left}px; top: ${windowPos.top}px;">
             <div class="panel-header">
               <div class="header-title-group">
                 <svg class="header-icon" viewBox="0 0 24 24">
@@ -826,9 +870,8 @@
     if (isCollapsed) {
       const pill = shadowRoot.querySelector('.collapsed-pill');
       if (pill) {
-        setupDraggable(pill, pill, () => {
-          isCollapsed = false;
-          render();
+        setupDraggable(pill, pill, true, () => {
+          openPanel();
         });
       }
       return;
@@ -841,13 +884,12 @@
     if (collapseBtn) {
       collapseBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        isCollapsed = true;
-        render();
+        collapsePanel();
       });
     }
 
     if (panelHeader && panelWindow) {
-      setupDraggable(panelHeader, panelWindow);
+      setupDraggable(panelHeader, panelWindow, false);
     }
 
     // Bookmark list item click and delete handling
@@ -876,7 +918,7 @@
     }
   }
 
-  function setupDraggable(handleEl, targetContainerEl, onClickIfNoDrag = null) {
+  function setupDraggable(handleEl, targetContainerEl, isPill = false, onClickIfNoDrag = null) {
     let isDragging = false;
     let hasMoved = false;
     let startX = 0;
@@ -892,8 +934,8 @@
       hasMoved = false;
       startX = e.clientX;
       startY = e.clientY;
-      startLeft = panelLeft;
-      startTop = panelTop;
+      startLeft = isPill ? pillPos.left : windowPos.left;
+      startTop = isPill ? pillPos.top : windowPos.top;
 
       handleEl.classList.add('dragging');
       window.addEventListener('mousemove', onMouseMove);
@@ -911,17 +953,25 @@
       }
 
       if (hasMoved) {
-        const containerWidth = targetContainerEl.offsetWidth || 140;
-        const containerHeight = targetContainerEl.offsetHeight || 40;
+        const width = isPill ? (targetContainerEl.offsetWidth || PILL_WIDTH) : (targetContainerEl.offsetWidth || WINDOW_WIDTH);
+        const height = isPill ? (targetContainerEl.offsetHeight || PILL_HEIGHT) : (targetContainerEl.offsetHeight || WINDOW_HEIGHT);
 
-        const maxLeft = window.innerWidth - containerWidth - 8;
-        const maxTop = window.innerHeight - containerHeight - 8;
+        const maxLeft = window.innerWidth - width - 8;
+        const maxTop = window.innerHeight - height - 8;
 
-        panelLeft = Math.max(8, Math.min(maxLeft, startLeft + dx));
-        panelTop = Math.max(8, Math.min(maxTop, startTop + dy));
+        const currentLeft = Math.max(8, Math.min(maxLeft, startLeft + dx));
+        const currentTop = Math.max(8, Math.min(maxTop, startTop + dy));
 
-        targetContainerEl.style.left = `${panelLeft}px`;
-        targetContainerEl.style.top = `${panelTop}px`;
+        if (isPill) {
+          pillPos.left = currentLeft;
+          pillPos.top = currentTop;
+        } else {
+          windowPos.left = currentLeft;
+          windowPos.top = currentTop;
+        }
+
+        targetContainerEl.style.left = `${currentLeft}px`;
+        targetContainerEl.style.top = `${currentTop}px`;
       }
     };
 
@@ -932,7 +982,18 @@
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('mouseup', onMouseUp);
 
-        if (!hasMoved && typeof onClickIfNoDrag === 'function') {
+        if (hasMoved) {
+          if (!isPill) {
+            // If user dragged the full window, sync pill position to window corner
+            const windowCenter = windowPos.left + (WINDOW_WIDTH / 2);
+            if (windowCenter > window.innerWidth / 2) {
+              pillPos.left = Math.max(8, windowPos.left + WINDOW_WIDTH - PILL_WIDTH);
+            } else {
+              pillPos.left = windowPos.left;
+            }
+            pillPos.top = windowPos.top;
+          }
+        } else if (typeof onClickIfNoDrag === 'function') {
           onClickIfNoDrag();
         }
       }
@@ -984,10 +1045,10 @@
 
     // If panel is collapsed, uncollapse to show newly created bookmark
     if (isCollapsed) {
-      isCollapsed = false;
+      openPanel();
+    } else {
+      render();
     }
-
-    render();
     showToast(`Bookmarked #${newBookmark.order}: "${label}"`);
   }
 
